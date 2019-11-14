@@ -22,7 +22,9 @@ class PackpayWoocommerce
 
     public function init_gateway_class()
     {
-        include plugin_dir_path(__FILE__).'PackpayGateway.php';
+        if (class_exists('WC_Payment_Gateway')) {
+            include plugin_dir_path(__FILE__) . 'PackpayGateway.php';
+        }
     }
 
     public function woocommerce_gateway($methods)
