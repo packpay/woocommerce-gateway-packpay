@@ -17,27 +17,27 @@ class PackpayGateway extends WC_Payment_Gateway
     public function __construct()
     {
 
-        $this->id                 = 'PackpayGateway';
-        $this->method_title       = 'درگاه پرداخت مستقیم پکپی';
-        $this->method_description = 'تنظیمات '.$this->method_title;
-        $this->icon               = plugins_url('/assets/images/logo.jpg', __FILE__);
-        $this->has_fields         = false;
+        $this->id = 'PackpayGateway';
+        $this->method_title = 'درگاه پرداخت مستقیم پکپی';
+        $this->method_description = 'تنظیمات ' . $this->method_title;
+        $this->icon = plugins_url('/assets/images/logo.jpg', __FILE__);
+        $this->has_fields = false;
 
         $this->init_form_fields();
         $this->init_settings();
 
         $this->save_options_init();
 
-        $this->title           = $this->settings['title'];
-        $this->description     = $this->settings['description'];
-        $this->client_id       = $this->settings['client_id'];
-        $this->secret_id       = $this->settings['secret_id'];
+        $this->title = $this->settings['title'];
+        $this->description = $this->settings['description'];
+        $this->client_id = $this->settings['client_id'];
+        $this->secret_id = $this->settings['secret_id'];
         $this->success_massage = wpautop(wptexturize($this->settings['success_massage']));
-        $this->failed_massage  = wpautop(wptexturize($this->settings['failed_massage']));
+        $this->failed_massage = wpautop(wptexturize($this->settings['failed_massage']));
 
-        add_action('woocommerce_receipt_'.$this->id.'', array($this, 'Send_to_ZarinPal_Gateway'));
+        add_action('woocommerce_receipt_' . $this->id . '', array($this, 'Send_to_Packpay_Gateway'));
         add_action(
-            'woocommerce_api_'.strtolower(get_class($this)).'',
+            'woocommerce_api_' . strtolower(get_class($this)) . '',
             array($this, 'return_from_gateway')
         );
     }
@@ -51,7 +51,7 @@ class PackpayGateway extends WC_Payment_Gateway
     {
         if (version_compare(WOOCOMMERCE_VERSION, '2.0.0', '>=')) {
             add_action(
-                'woocommerce_update_options_payment_gateways_'.$this->id,
+                'woocommerce_update_options_payment_gateways_' . $this->id,
                 array($this, 'process_admin_options')
             );
         } else {
@@ -62,69 +62,69 @@ class PackpayGateway extends WC_Payment_Gateway
     public function init_form_fields()
     {
         $this->form_fields = [
-            'base_config'     => [
-                'title'       => 'تنظیمات اصلی',
-                'type'        => 'title',
+            'base_config' => [
+                'title' => 'تنظیمات اصلی',
+                'type' => 'title',
                 'description' => '',
             ],
-            'enabled'         => [
-                'title'       => 'فعال بودن درگاه',
-                'type'        => 'checkbox',
-                'label'       => 'فعال بودن درگاه',
+            'enabled' => [
+                'title' => 'فعال بودن درگاه',
+                'type' => 'checkbox',
+                'label' => 'فعال بودن درگاه',
                 'description' => 'دررصوت فعال بودن این درگاه در فهرست درگاه های شما ظاهر خواهد شد.',
-                'default'     => 'yes',
-                'desc_tip'    => true,
+                'default' => 'yes',
+                'desc_tip' => true,
             ],
-            'title'           => [
-                'title'       => 'عنوان درگاه پرداخت',
-                'type'        => 'text',
+            'title' => [
+                'title' => 'عنوان درگاه پرداخت',
+                'type' => 'text',
                 'description' => 'عنوان درگاه که در طی خرید به مشتری نمایش داده میشود',
-                'default'     => 'درگاه پرداخت مستقیم پکپی',
-                'desc_tip'    => true,
+                'default' => 'درگاه پرداخت مستقیم پکپی',
+                'desc_tip' => true,
             ],
-            'description'     => [
-                'title'       => 'توضیحات درگاه پرداخت',
-                'type'        => 'text',
-                'desc_tip'    => true,
+            'description' => [
+                'title' => 'توضیحات درگاه پرداخت',
+                'type' => 'text',
+                'desc_tip' => true,
                 'description' => 'توضیحاتی که در طی عملیات پرداخت برای درگاه پرداخت نمایش داده خواهد شد',
-                'default'     => 'پرداخت مستقیم به وسیله کلیه کارت های عضو شتاب',
+                'default' => 'پرداخت مستقیم به وسیله کلیه کارت های عضو شتاب',
             ],
-            'account_config'  => [
-                'title'       => 'تنظیمات سرویس',
-                'type'        => 'title',
+            'account_config' => [
+                'title' => 'تنظیمات سرویس',
+                'type' => 'title',
                 'description' => '',
             ],
-            'client_id'       => [
-                'title'   => 'Client ID',
-                'type'    => 'text',
+            'client_id' => [
+                'title' => 'Client ID',
+                'type' => 'text',
                 'default' => '',
             ],
-            'secret_id'       => [
-                'title'   => 'Secret ID',
-                'type'    => 'text',
+            'secret_id' => [
+                'title' => 'Secret ID',
+                'type' => 'text',
                 'default' => '',
             ],
-            'refresh_token'   => [
-                'title'   => 'Refresh Token',
-                'type'    => 'text',
+            'refresh_token' => [
+                'title' => 'Refresh Token',
+                'type' => 'text',
                 'default' => '',
             ],
-            'payment_config'  => [
-                'title'       => 'تنظیمات عملیات پرداخت',
-                'type'        => 'title',
+            'payment_config' => [
+                'title' => 'تنظیمات عملیات پرداخت',
+                'type' => 'title',
                 'description' => '',
             ],
             'success_massage' => [
-                'title'       => 'پیام پرداخت موفق',
-                'type'        => 'textarea',
+                'title' => 'پیام پرداخت موفق',
+                'type' => 'textarea',
                 'description' => 'متن پیامی که میخواهید بعد از پرداخت موفق به کاربر نمایش دهید را وارد نمایید . همچنین می توانید از شورت کد {transaction_id} برای نمایش کد رهگیری (توکن) زرین پال استفاده نمایید.',
-                'default'     => 'با تشکر از شما . سفارش شما با موفقیت پرداخت شد.',
+                'default' => 'با تشکر از شما . سفارش شما با موفقیت پرداخت شد.',
             ],
-            'failed_massage'  => [
-                'title'       => 'پیام پرداخت ناموفق',
-                'type'        => 'textarea',
+            'failed_massage' => [
+                'title' => 'پیام پرداخت ناموفق',
+                'type' => 'textarea',
                 'description' => 'متن پیامی که میخواهید بعد از پرداخت ناموفق به کاربر نمایش دهید را وارد نمایید . همچنین می توانید از شورت کد {fault} برای نمایش دلیل خطای رخ داده استفاده نمایید . این دلیل خطا از سایت زرین پال ارسال میگردد.',
-                'default'     => 'پرداخت شما ناموفق بوده است . لطفا مجددا تلاش نمایید یا در صورت بروز اشکال با مدیر سایت تماس بگیرید.',
+                'default' => 'پرداخت شما ناموفق بوده است . لطفا مجددا تلاش نمایید یا در صورت بروز اشکال با مدیر سایت تماس بگیرید.',
             ],
         ];
     }
@@ -132,12 +132,12 @@ class PackpayGateway extends WC_Payment_Gateway
     public function refresh_token()
     {
         $this->init_settings();
-        $data        = [
-            'grant_type'    => 'refresh_token',
+        $data = [
+            'grant_type' => 'refresh_token',
             'refresh_token' => $this->settings['refresh_token'],
         ];
-        $method      = 'oauth/token?'.http_build_query($data);
-        $result      = $this->request($method, []);
+        $method = 'oauth/token?' . http_build_query($data);
+        $result = $this->request($method, []);
         $this->token = $result['access_token'];
         $this->update_option('token', $this->token);
     }
@@ -146,13 +146,14 @@ class PackpayGateway extends WC_Payment_Gateway
     {
         //$call_back_url = add_query_arg('wc_order', $order_id, WC()->api_request_url($this->id));
         $call_back_url = WC()->api_request_url($this->id);
-        $data          = [
+        $data = [
             'access_token' => $this->token,
-            'amount'       => $amount,
+            'amount' => $amount,
             'callback_url' => $call_back_url,
+            'verify_on_request' => true
         ];
-        $method        = 'developers/bank/api/v1/purchase?'.http_build_query($data);
-        $result        = $this->request($method, []);
+        $method = 'developers/bank/api/v1/purchase?' . http_build_query($data);
+        $result = $this->request($method, []);
 
         return $result;
     }
@@ -160,31 +161,31 @@ class PackpayGateway extends WC_Payment_Gateway
     public function process_payment($order_id)
     {
         global $woocommerce;
-        $order                                  = new WC_Order($order_id);
+        $order = new WC_Order($order_id);
         $woocommerce->session->order_id_packpay = $order_id;
 
         $currency = $order->get_currency();
-        $total    = $this->amount_normalize($order->total, $currency);
+        $total = $this->amount_normalize($order->total, $currency);
 
         $this->refresh_token();
 
-        $result         = $this->purchase($total, $order_id);
+        $result = $this->purchase($total, $order_id);
         $reference_code = $result['reference_code'];
 
         return array(
-            'result'   => $result['status'] === '0' ? 'success' : 'failure',
-            'redirect' => $this->base_api.'bank/purchase/send?RefId='.$reference_code,
+            'result' => $result['status'] === '0' ? 'success' : 'failure',
+            'redirect' => $this->base_api . 'bank/purchase/send?RefId=' . $reference_code,
         );
     }
 
     public function request($method, $params, $type = 'POST')
     {
         try {
-            $ch = curl_init($this->base_api.$method);
+            $ch = curl_init($this->base_api . $method);
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $type);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_USERPWD, $this->client_id.":".$this->secret_id);
+            curl_setopt($ch, CURLOPT_USERPWD, $this->client_id . ":" . $this->secret_id);
             curl_setopt(
                 $ch,
                 CURLOPT_HTTPHEADER,
@@ -223,32 +224,32 @@ class PackpayGateway extends WC_Payment_Gateway
         return $amount;
     }
 
-    public function Send_to_ZarinPal_Gateway($order_id)
+    public function Send_to_Packpay_Gateway($order_id)
     {
 
         global $woocommerce;
 
-        $woocommerce->session->order_id_zarinpal = $order_id;
-        $order                                   = new WC_Order($order_id);
-        $currency                                = $order->get_currency();
-        $currency                                = apply_filters('WC_ZPal_Currency', $currency, $order_id);
+        $woocommerce->session->order_id_packpay = $order_id;
+        $order = new WC_Order($order_id);
+        $currency = $order->get_currency();
+        $currency = apply_filters('WC_Pkp_Currency', $currency, $order_id);
 
 
-        $form = '<form action="" method="POST" class="zarinpal-checkout-form" id="zarinpal-checkout-form">
-						<input type="submit" name="zarinpal_submit" class="button alt" id="zarinpal-payment-button" value="'.__(
+        $form = '<form action="" method="POST" class="packpay-checkout-form" id="packpay-checkout-form">
+						<input type="submit" name="packpay_submit" class="button alt" id="packpay-payment-button" value="' . __(
                 'پرداخت',
                 'woocommerce'
-            ).'"/>
-						<a class="button cancel" href="'.$woocommerce->cart->get_checkout_url().'">'.__(
-                    'بازگشت',
-                    'woocommerce'
-                ).'</a>
+            ) . '"/>
+						<a class="button cancel" href="' . $woocommerce->cart->get_checkout_url() . '">' . __(
+                'بازگشت',
+                'woocommerce'
+            ) . '</a>
 					 </form><br/>';
-        $form = apply_filters('WC_ZPal_Form', $form, $order_id, $woocommerce);
+        $form = apply_filters('WC_Pkp_Form', $form, $order_id, $woocommerce);
 
-        do_action('WC_ZPal_Gateway_Before_Form', $order_id, $woocommerce);
+        do_action('WC_Pkp_Gateway_Before_Form', $order_id, $woocommerce);
         echo $form;
-        do_action('WC_ZPal_Gateway_After_Form', $order_id, $woocommerce);
+        do_action('WC_Pkp_Gateway_After_Form', $order_id, $woocommerce);
         die;
 
         $Amount = intval($order->order_total);
@@ -265,65 +266,64 @@ class PackpayGateway extends WC_Payment_Gateway
             $currency
         );
         $Amount = apply_filters('woocommerce_order_amount_total_IRANIAN_gateways_irt', $Amount, $currency);
-        $Amount = apply_filters('woocommerce_order_amount_total_ZarinPal_gateway', $Amount, $currency);
+        $Amount = apply_filters('woocommerce_order_amount_total_Packpay_gateway', $Amount, $currency);
 
         $MerchantCode = $this->merchantcode;
-        $CallbackUrl  = add_query_arg('wc_order', $order_id, WC()->api_request_url('WC_ZPal'));
+        $CallbackUrl = add_query_arg('wc_order', $order_id, WC()->api_request_url('WC_Pkp'));
 
-        $products    = array();
+        $products = array();
         $order_items = $order->get_items();
         foreach ((array)$order_items as $product) {
-            $products[] = $product['name'].' ('.$product['qty'].') ';
+            $products[] = $product['name'] . ' (' . $product['qty'] . ') ';
         }
         $products = implode(' - ', $products);
 
-        $Description = 'خرید به شماره سفارش : '.$order->get_order_number(
-            ).' | خریدار : '.$order->billing_first_name.' '.$order->billing_last_name.' | محصولات : '.$products;
-        $Mobile      = get_post_meta($order_id, '_billing_phone', true) ? get_post_meta(
+        $Description = 'خرید به شماره سفارش : ' . $order->get_order_number() . ' | خریدار : ' . $order->billing_first_name . ' ' . $order->billing_last_name . ' | محصولات : ' . $products;
+        $Mobile = get_post_meta($order_id, '_billing_phone', true) ? get_post_meta(
             $order_id,
             '_billing_phone',
             true
         ) : '-';
-        $Email       = $order->billing_email;
-        $Paymenter   = $order->billing_first_name.' '.$order->billing_last_name;
-        $ResNumber   = intval($order->get_order_number());
+        $Email = $order->billing_email;
+        $Paymenter = $order->billing_first_name . ' ' . $order->billing_last_name;
+        $ResNumber = intval($order->get_order_number());
 
         //Hooks for iranian developer
-        $Description = apply_filters('WC_ZPal_Description', $Description, $order_id);
-        $Mobile      = apply_filters('WC_ZPal_Mobile', $Mobile, $order_id);
-        $Email       = apply_filters('WC_ZPal_Email', $Email, $order_id);
-        $Paymenter   = apply_filters('WC_ZPal_Paymenter', $Paymenter, $order_id);
-        $ResNumber   = apply_filters('WC_ZPal_ResNumber', $ResNumber, $order_id);
-        do_action('WC_ZPal_Gateway_Payment', $order_id, $Description, $Mobile);
-        $Email  = ! filter_var($Email, FILTER_VALIDATE_EMAIL) === false ? $Email : '';
+        $Description = apply_filters('WC_Pkp_Description', $Description, $order_id);
+        $Mobile = apply_filters('WC_Pkp_Mobile', $Mobile, $order_id);
+        $Email = apply_filters('WC_Pkp_Email', $Email, $order_id);
+        $Paymenter = apply_filters('WC_Pkp_Paymenter', $Paymenter, $order_id);
+        $ResNumber = apply_filters('WC_Pkp_ResNumber', $ResNumber, $order_id);
+        do_action('WC_Pkp_Gateway_Payment', $order_id, $Description, $Mobile);
+        $Email = !filter_var($Email, FILTER_VALIDATE_EMAIL) === false ? $Email : '';
         $Mobile = preg_match('/^09[0-9]{9}/i', $Mobile) ? $Mobile : '';
 
-        $acczarin = ($this->settings['zarinwebgate'] == 'no') ? 'https://www.zarinpal.com/pg/StartPay/%s/' : 'https://www.zarinpal.com/pg/StartPay/%s/ZarinGate';
+        $acczarin = ($this->settings['zarinwebgate'] == 'no') ? 'https://www.packpay.com/pg/StartPay/%s/' : 'https://www.packpay.com/pg/StartPay/%s/ZarinGate';
 
         $data = array(
-            'MerchantID'  => $this->merchantcode,
-            'Amount'      => $Amount,
+            'MerchantID' => $this->merchantcode,
+            'Amount' => $Amount,
             'CallbackURL' => $CallbackUrl,
             'Description' => $Description,
         );
 
         $result = $this->request('PaymentRequest', json_encode($data));
         if ($result === false) {
-            echo "cURL Error #:".$err;
+            echo "cURL Error #:" . $err;
         } else {
             if ($result["Status"] == 100) {
                 wp_redirect(sprintf($acczarin, $result['Authority']));
                 exit;
             } else {
-                $Message = ' تراکنش ناموفق بود- کد خطا : '.$result["Status"];
-                $Fault   = '';
+                $Message = ' تراکنش ناموفق بود- کد خطا : ' . $result["Status"];
+                $Fault = '';
             }
         }
 
-        if ( ! empty($Message) && $Message) {
+        if (!empty($Message) && $Message) {
 
             $Note = sprintf(__('خطا در هنگام ارسال به بانک : %s', 'woocommerce'), $Message);
-            $Note = apply_filters('WC_ZPal_Send_to_Gateway_Failed_Note', $Note, $order_id, $Fault);
+            $Note = apply_filters('WC_Pkp_Send_to_Gateway_Failed_Note', $Note, $order_id, $Fault);
             $order->add_order_note($Note);
 
 
@@ -331,12 +331,12 @@ class PackpayGateway extends WC_Payment_Gateway
                 __('در هنگام اتصال به بانک خطای زیر رخ داده است : <br/>%s', 'woocommerce'),
                 $Message
             );
-            $Notice = apply_filters('WC_ZPal_Send_to_Gateway_Failed_Notice', $Notice, $order_id, $Fault);
+            $Notice = apply_filters('WC_Pkp_Send_to_Gateway_Failed_Notice', $Notice, $order_id, $Fault);
             if ($Notice) {
                 wc_add_notice($Notice, 'error');
             }
 
-            do_action('WC_ZPal_Send_to_Gateway_Failed', $order_id, $Fault);
+            do_action('WC_Pkp_Send_to_Gateway_Failed', $order_id, $Fault);
         }
     }
 
@@ -360,21 +360,21 @@ class PackpayGateway extends WC_Payment_Gateway
         $fault_message = '';
 
         if ($order_id) {
-            $order    = new WC_Order($order_id);
+            $order = new WC_Order($order_id);
             //$currency = $order->get_currency();
-            $amount   = intval($order->get_total());
+            $amount = intval($order->get_total());
 
             if ($order->get_status() != 'completed') {
 
 
                 $this->refresh_token();
-                $data   = [
-                    'access_token'   => $this->token,
+                $data = [
+                    'access_token' => $this->token,
                     'reference_code' => $_GET['reference_code'],
                 ];
-                $method = 'developers/bank/api/v1/purchase?'.http_build_query($data);
-                $result = $this->request($method, [], 'GET');
-                $access = $result['data'][0]['transactionStatus'] == 'ناموفق' ? false : true;
+                $method = 'developers/bank/api/v1/purchase/verify?' . http_build_query($data);
+                $result = $this->request($method, [], 'POST');
+                $access = $result->status == 0 && $result->message == 'successful' ? false : true;
 
                 if ($access) {
                     update_post_meta($order_id, '_transaction_id', $reference_code);
@@ -409,8 +409,8 @@ class PackpayGateway extends WC_Payment_Gateway
             } else {
                 //Order is Ok redirect and show transaction_id
                 $reference_code = get_post_meta($order_id, '_transaction_id', true);
-                $notice         = $this->success_massage;
-                $notice         = str_replace("{transaction_id}", $reference_code, $notice);
+                $notice = $this->success_massage;
+                $notice = str_replace("{transaction_id}", $reference_code, $notice);
                 if ($notice) {
                     wc_add_notice($notice, 'success');
                 }
@@ -419,7 +419,7 @@ class PackpayGateway extends WC_Payment_Gateway
             }
         } else {
             //Order was not exist
-            $Fault  = 'شماره سفارش وجود ندارد .';
+            $Fault = 'شماره سفارش وجود ندارد .';
             $notice = $this->failed_massage;
             $notice = str_replace("{fault}", $Fault, $notice);
             if ($notice) {
@@ -437,35 +437,35 @@ class PackpayGateway extends WC_Payment_Gateway
             if ($_GET['Status'] == "OK") {
 
                 $MerchantID = $this->merchantcode;
-                $Amount     = intval($order->order_total);
+                $Amount = intval($order->order_total);
 
 
                 $Authority = $_GET['Authority'];
 
-                $data   = array(
+                $data = array(
                     'MerchantID' => $MerchantID,
-                    'Authority'  => $Authority,
-                    'Amount'     => $Amount,
+                    'Authority' => $Authority,
+                    'Amount' => $Amount,
                 );
                 $result = $this->request('PaymentVerification', json_encode($data));
 
                 if ($result['Status'] == 100) {
-                    $Status         = 'completed';
+                    $Status = 'completed';
                     $Transaction_ID = $result['RefID'];
-                    $Fault          = '';
-                    $Message        = '';
+                    $Fault = '';
+                    $Message = '';
                 } elseif ($result['Status'] == 101) {
                     $Message = 'این تراکنش قلا تایید شده است';
                     wp_redirect(add_query_arg('wc_status', 'success', $this->get_return_url($order)));
                     exit;
                 } else {
-                    $Status  = 'failed';
-                    $Fault   = $result['Status'];
+                    $Status = 'failed';
+                    $Fault = $result['Status'];
                     $Message = 'تراکنش ناموفق بود';
                 }
             } else {
-                $Status  = 'failed';
-                $Fault   = '';
+                $Status = 'failed';
+                $Fault = '';
                 $Message = 'تراکنش انجام نشد .';
             }
 
