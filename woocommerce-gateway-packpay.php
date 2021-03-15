@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Woocommerce Gateway Packpay
-Version: 1.2
+Version: 1.3
 Description: packpay gateway
 Plugin URI: https://packpay.ir
 Author: Navid Safavi & Parham Damavandi

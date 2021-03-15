@@ -151,14 +151,17 @@ class PackpayGateway extends WC_Payment_Gateway
         $this->update_option('token', $this->token);
     }
 
-    public function purchase($amount, $order_id)
+    public function purchase($amount, $order)
     {
         $call_back_url = WC()->api_request_url($this->id);
+        $order_data = $order->get_data();
+        $order_owner_name=$order_data['billing']['first_name'].' '.$order_data['billing']['last_name'];
         $data = [
             'access_token' => $this->token,
             'amount' => $amount,
             'callback_url' => $call_back_url,
-            'verify_on_request' => true
+            'verify_on_request' => true,
+            'payer_name' => $order_owner_name
         ];
         $method = 'developers/bank/api/v2/purchase?' . http_build_query($data);
         $result = $this->request($method, []);
@@ -174,7 +177,7 @@ class PackpayGateway extends WC_Payment_Gateway
         $total = $this->amount_normalize($order->total);
         $this->refresh_token();
 
-        $result = $this->purchase($total, $order_id);
+        $result = $this->purchase($total, $order);
         if ($result['status'] === '0'){
             $reference_code = $result['reference_code'];
             return array(
