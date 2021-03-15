@@ -229,6 +229,14 @@ class PackpayGateway extends WC_Payment_Gateway
 
         $woocommerce->session->order_id_packpay = $order_id;
 
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $requestResult = $this->process_payment($order_id);
+            if ($requestResult['result'] === 'success') {
+                wp_redirect($requestResult['redirect']);
+                exit;
+            }
+        }
+
         $form = '<form action="" method="POST" class="packpay-checkout-form" id="packpay-checkout-form">
 						<input type="submit" name="packpay_submit" class="button alt" id="packpay-payment-button" value="' . __(
                 'پرداخت',
@@ -244,7 +252,6 @@ class PackpayGateway extends WC_Payment_Gateway
         do_action('WC_Pkp_Gateway_Before_Form', $order_id, $woocommerce);
         echo $form;
         do_action('WC_Pkp_Gateway_After_Form', $order_id, $woocommerce);
-
     }
 
     public function return_from_gateway()
